@@ -21,18 +21,19 @@ class TimeLoop
     public:
         TimeLoop(int dummy);
 
-        void setSecondsTicker(long value);
-        void setDayTicker(long value);
-        bool incrementSecondsTicker(long value);
-        void incrementDayTicker(long value);
-        long getSecondsTicker();
-        long getDayTicker();
+        void setSecondsCounter(long value);
+        void setDayCounter(long value);
+        bool incrementSecondsCounter(long increment);
+        void incrementDayCounter(int increment);
+        long getSecondsCounter();
+        long getDayCounter();
 
 
         //
         byte actualize();
         //
         String getHrsMinSec();
+        String getDayMonYear();
 
         byte getDow(int increment);
         String getDowName();
@@ -42,13 +43,15 @@ class TimeLoop
 
     protected:
     private:
+        //methods
+        void breakDayCounter();
 
         // variables
-
         unsigned long lastDeciSecsIncMillis;
         int deciSecondsCounter;
-        long secondsTicker;
-        long dayTicker;
+        long secondsCounter;
+        long dayCounter;
+
         int secs;
         int mins;
         int hrs;
