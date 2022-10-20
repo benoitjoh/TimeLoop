@@ -1,9 +1,14 @@
 TimeLoop	KEYWORD1
 setSecondsTicker	KEYWORD2
 setDayTicker	KEYWORD2
-deciSecondPassed	KEYWORD2
+incrementSecondsTicker	KEYWORD2
+incrementDayTicker	KEYWORD2
+getSecondsTicker	KEYWORD2
+getDayTicker	KEYWORD2
+actualize	KEYWORD2
 getHrsMinSec	KEYWORD2
 getDowName	KEYWORD2
 deciSecondPassed	KEYWORD2
-
+getDow	KEYWORD2
+getDowName	KEYWORD2
 

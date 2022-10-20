@@ -6,8 +6,8 @@
 //                                                        Johannes Benoit 2022
 // ***************************************************************************
 
-#ifndef TIMEHANDLER_H
-#define TIMEHANDLER_H
+#ifndef TimeLoop_H
+#define TimeLoop_H
 
 #include "Arduino.h"
 
@@ -16,21 +16,29 @@
 #define LEAP_YEAR(Y)     ( ((Y)>0) && !((Y)%4) && ( ((Y)%100) || !((Y)%400) ) )
 
 
-class TimeHandler
+class TimeLoop
 {
     public:
-        TimeHandler(int dummy);
+        TimeLoop(int dummy);
 
         void setSecondsTicker(long value);
         void setDayTicker(long value);
+        bool incrementSecondsTicker(long value);
+        void incrementDayTicker(long value);
+        long getSecondsTicker();
+        long getDayTicker();
+
+
         //
-        bool deciSecondPassed();
+        byte actualize();
         //
         String getHrsMinSec();
 
+        byte getDow(int increment);
         String getDowName();
 
-
+        byte getMonth(int increment);
+        String getMonthName();
 
     protected:
     private:
@@ -51,4 +59,4 @@ class TimeHandler
 
 };
 
-#endif // TIMEHANDLER_H
+#endif // TimeLoop_H

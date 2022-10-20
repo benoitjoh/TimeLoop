@@ -1,12 +1,10 @@
-
-
-#include "TimeHandler.h"
+#include "TimeLoop.h"
 
 
 const String dow[7] = {"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
 
 
-static const int monthDays[]={0,31,28,31,30,31,30,31,31,30,31,30,31}; // starts months from 1
+static const int monthDays[]={0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; // starts months from 1
 
 
 /** @brief helper that makes numbers 2 digits
@@ -22,38 +20,79 @@ String lFill(String a) {
 
 /** @brief Constructor
   */
-TimeHandler::TimeHandler(int dummy) {
+TimeLoop::TimeLoop(int dummy) {
     lastDeciSecsIncMillis = 0;
     deciSecondsCounter = 0;
 
 }
 
-void TimeHandler::setSecondsTicker(long value) {
+/* getter / setter */
+
+void TimeLoop::setSecondsTicker(long value) {
     secondsTicker = value;
 }
 
-void TimeHandler::setDayTicker(long value) {
+void TimeLoop::setDayTicker(long value) {
     dayTicker = value;
 }
 
-/** @brief called in a mainloop it increments the timer
-  *
-  *
+long TimeLoop::getSecondsTicker() {
+    return secondsTicker;
+}
+long TimeLoop::getDayTicker() {
+    return dayTicker;
+}
+
+
+/** @brief adds value to secondsTicker. returns true if overflow
   */
-bool TimeHandler::deciSecondPassed() {
-    if ( millis() - lastDeciSecsIncMillis >= 100 ) {
-        deciSecondsCounter++;
-        lastDeciSecsIncMillis += 100;
-        if (deciSecondsCounter >= 10) {
-          deciSecondsCounter = 0;
-          secondsTicker++;
-        }
+bool TimeLoop::incrementSecondsTicker(long value) {
+    secondsTicker = secondsTicker + value;
+    if (secondsTicker < 0) {
+        secondsTicker += 86400;
+        dayTicker--;
+        return true;
+    }
+    if (secondsTicker >= 86400) {
+        secondsTicker -= 86400;
+        dayTicker++;
         return true;
     }
     return false;
 }
 
-String TimeHandler::getHrsMinSec() {
+void TimeLoop::incrementDayTicker(long value) {
+    dayTicker = dayTicker + value;
+}
+
+
+
+
+
+
+/** @brief called in a mainloop it increments the timer
+  *
+  * if 100ms has passed,       --> return 1
+  * if 1 second has passed      --> return 2
+  * if a day finished (midnight) --> returns 3
+  */
+byte TimeLoop::actualize() {
+    if ( millis() - lastDeciSecsIncMillis >= 100 ) {
+        deciSecondsCounter++;
+        lastDeciSecsIncMillis += 100;
+        if (deciSecondsCounter >= 10) {
+          deciSecondsCounter = 0;
+          if (incrementSecondsTicker(1)) {
+            return 3;
+          }
+          return 2;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+String TimeLoop::getHrsMinSec() {
 
     secs = secondsTicker % 60;
     unsigned int remains = secondsTicker / 60;
@@ -62,10 +101,19 @@ String TimeHandler::getHrsMinSec() {
     return lFill(String(hrs)) + ":" + lFill(String(mins)) + ":" +  lFill(String(secs));
 }
 
+byte TimeLoop::getDow(int increment){
+    wDay = ((dayTicker + 4) % 7);  // Monday is day 0
+    wDay += increment;
+    if (wDay > 6) { wDay = 0}
+    if (wDay < 0) { wDay = 6}
+    return wDay;
+}
+String TimeLoop::getDowName() {
+    return dow[getDow(0)];
+}
 
-String TimeHandler::getDowName() {
-   wDay = ((dayTicker + 4) % 7);  // Monday is day 0
-   return dow[wDay];
+byte getMonth(int increment) {
+    return month;
 }
 
 /** @brief (one liner)
@@ -73,7 +121,7 @@ String TimeHandler::getDowName() {
   * break the given time_t into time components
   * this is a more compact version of the C library localtime function
 
-void TimeHandler::breakTime(){
+void TimeLoop::breakTime(){
 //
 // note that year is offset from 1970 !!!
 
