@@ -10,7 +10,7 @@
 
 
 static const String dow[7] = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
-static const String monthNames[13]={"", "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug" , "Sep" , "Okt" , "Nov" , "Dez" };
+static const String monthNames[13]={"", "Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug" , "Sep" , "Okt" , "Nov" , "Dez" };
 
 
 /** @brief Method to calculate the days in a month in a given year
@@ -166,8 +166,8 @@ String TimeLoop::getDayMonYear() {
 int TimeLoop::getDow(int increment){
     wDay = ((dayCounter + 4) % 7);  // Monday is day 0
     wDay += increment;
-    if (wDay > 6) { wDay = 0; }
-    if (wDay < 0) { wDay = 6; }
+    if (wDay > 6) { wDay -= 7; }
+    if (wDay < 0) { wDay += 7; }
     return wDay;
 }
 String TimeLoop::getDowName(int increment) {
@@ -176,8 +176,8 @@ String TimeLoop::getDowName(int increment) {
 
 int TimeLoop::getMonth(int increment) {
     int myMonth = month + increment;
-    if (myMonth > 12) { myMonth = 1; }
-    if (myMonth < 1) { myMonth = 12; }
+    if (myMonth > 12) { myMonth -= 12; }
+    if (myMonth < 1) { myMonth += 12; }
     return myMonth;
 
 
