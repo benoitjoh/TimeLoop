@@ -12,8 +12,6 @@
 #include "Arduino.h"
 
 
-// leap year calculator expects year argument as year yyyy
-#define LEAP_YEAR(Y)     ( ((Y)>0) && !((Y)%4) && ( ((Y)%100) || !((Y)%400) ) )
 
 byte getMonthLength(int myMonth, int myYear);
 
@@ -36,11 +34,11 @@ class TimeLoop
         String getHrsMinSec();
         String getDayMonYear();
 
-        byte getDow(int increment);
-        String getDowName();
+        int getDow(int increment);
+        String getDowName(int increment);
 
-        byte getMonth(int increment);
-        String getMonthName();
+        int getMonth(int increment);
+        String getMonthName(int increment);
 
         void incrementMonth();
         void incrementYear() ;

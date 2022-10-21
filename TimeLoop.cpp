@@ -1,16 +1,22 @@
 #include "TimeLoop.h"
 
-
-
 #define YEAR_OFFSET 2020 // 1.1.2020 ==> 1 in the daysCounter
 
-const String dow[7] = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
+
+// --------  helper -----------------------------------------------------------------
+
+// leap year calculator expects year argument as year yyyy
+#define LEAP_YEAR(Y)     ( ((Y)>0) && !((Y)%4) && ( ((Y)%100) || !((Y)%400) ) )
+
+
+static const String dow[7] = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
+static const String monthNames[13]={"", "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug" , "Sep" , "Okt" , "Nov" , "Dez" };
 
 
 /** @brief Method to calculate the days in a month in a given year
  *
- *                             Dec Jan Feb Mar Apr...                          Dec */
-static const int monthDays[]={ 31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+ *                               Dec Jan Feb Mar Apr...                          Dec */
+static const int monthDays[13]={ 31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 byte getMonthLength(int myMonth, int myYear) {
     byte monthLength = monthDays[myMonth];
@@ -35,6 +41,7 @@ String lFill(String a) {
     return a;
 }
 
+// -------- CLASS TimeLoop -----------------------------------------------------------------
 
 /** @brief Constructor
   */
@@ -144,7 +151,7 @@ String TimeLoop::getHrsMinSec() {
     return lFill(String(hrs)) + ":" + lFill(String(mins)) + ":" +  lFill(String(secs));
 }
 
-/** @brief returns a string hh:mm:ss
+/** @brief returns a string dd.mm.yyyy
   *
   */
 String TimeLoop::getDayMonYear() {
@@ -156,19 +163,27 @@ String TimeLoop::getDayMonYear() {
 /** @brief returns the weekday. Actual, in future or passed by increment days
   *
   */
-byte TimeLoop::getDow(int increment){
+int TimeLoop::getDow(int increment){
     wDay = ((dayCounter + 4) % 7);  // Monday is day 0
     wDay += increment;
     if (wDay > 6) { wDay = 0; }
     if (wDay < 0) { wDay = 6; }
     return wDay;
 }
-String TimeLoop::getDowName() {
-    return dow[getDow(0)];
+String TimeLoop::getDowName(int increment) {
+    return dow[getDow(increment)];
 }
 
-byte TimeLoop::getMonth(int increment) {
-    return month + increment;
+int TimeLoop::getMonth(int increment) {
+    int myMonth = month + increment;
+    if (myMonth > 12) { myMonth = 1; }
+    if (myMonth < 1) { myMonth = 12; }
+    return myMonth;
+
+
+}
+String TimeLoop::getMonthName(int increment) {
+    return monthNames[getMonth(increment)];
 }
 
 
@@ -180,17 +195,18 @@ byte TimeLoop::getMonth(int increment) {
 */
 
 void TimeLoop::breakupDayCounter(){
-    // note that daysCounter has offset from year 2020
+    // note that dayCounter has offset from year 2020
 
-    // calculate the year
+    // calculate the year. Increment from year to year until we step over dayCounter
     year = YEAR_OFFSET;
     unsigned long myDays = 0;
     while((unsigned)(myDays += (LEAP_YEAR(year) ? 366 : 365)) <= dayCounter) {
         year++;
     }
+    myDays -= LEAP_YEAR(year) ? 366 : 365; // one step back to the 1.Jan of the year
 
     // calculate month
-    myDays -= LEAP_YEAR(year) ? 366 : 365;
+    myDays = dayCounter - myDays; // day of year
     for (month = 1; month < 13; month++) {
         byte monthLength = getMonthLength(month, year);
 
@@ -202,7 +218,7 @@ void TimeLoop::breakupDayCounter(){
         }
     }
     //these are the updated class variables
-    day = myDays + 1; // day of month
+    day = myDays; // day of month
     month = month;
     year = year;
 }
