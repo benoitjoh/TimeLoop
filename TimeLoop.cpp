@@ -2,15 +2,30 @@
 
 
 
-#define YEAR_OFFSET 2020 // 1.1.2020 = 1
+#define YEAR_OFFSET 2020 // 1.1.2020 ==> 1 in the daysCounter
 
 const String dow[7] = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
 
 
-static const int monthDays[]={ 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; // starts months from 1
+/** @brief Method to calculate the days in a month in a given year
+ *
+ *                             Dec Jan Feb Mar Apr...                          Dec */
+static const int monthDays[]={ 31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+byte getMonthLength(int myMonth, int myYear) {
+    byte monthLength = monthDays[myMonth];
+    if (myMonth == 2) { // february
+        if (LEAP_YEAR(myYear)) {
+            monthLength++;
+        }
+    }
+    return monthLength;
+}
+
 
 
 /** @brief helper that makes numbers 2 digits
+  *
   */
 String lFill(String a) {
     // fills a string with letters from left side that the resulting length is reached
@@ -39,8 +54,7 @@ void TimeLoop::setSecondsCounter(long value) {
 
 void TimeLoop::setDayCounter(long value) {
     dayCounter = value;
-    breakDayCounter();
-
+    breakupDayCounter();
 }
 
 long TimeLoop::getSecondsCounter() {
@@ -70,8 +84,31 @@ bool TimeLoop::incrementSecondsCounter(long increment) {
 
 void TimeLoop::incrementDayCounter(int increment) {
     dayCounter = dayCounter + increment;
-    breakDayCounter();
+    breakupDayCounter();
 }
+
+/* methods for seting the date */
+
+void TimeLoop::incrementMonth() {
+    dayCounter += getMonthLength(month, year);
+    breakupDayCounter();
+}
+
+void TimeLoop::decrementMonth() {
+    dayCounter -= getMonthLength(month - 1, year);
+    breakupDayCounter();
+}
+
+void TimeLoop::incrementYear() {
+    dayCounter += (LEAP_YEAR(year) ? 366 : 365);
+    breakupDayCounter();
+}
+
+void TimeLoop::decrementYear() {
+    dayCounter -= (LEAP_YEAR(year - 1) ? 366 : 365);
+    breakupDayCounter();
+}
+
 
 
 /** @brief called in a mainloop it increments the timer
@@ -116,7 +153,7 @@ String TimeLoop::getDayMonYear() {
 }
 
 
-/** @brief returns the day of week. Actual, in future or passed
+/** @brief returns the weekday. Actual, in future or passed by increment days
   *
   */
 byte TimeLoop::getDow(int increment){
@@ -134,13 +171,15 @@ byte TimeLoop::getMonth(int increment) {
     return month + increment;
 }
 
-/** @brief (one liner)
+
+
+/** @brief splits dayCounter in day month year
   *
   * break the given dayCounter counting from 1.1.2020 into day / month / year
   * derived from C library localtime function
 */
 
-void TimeLoop::breakDayCounter(){
+void TimeLoop::breakupDayCounter(){
     // note that daysCounter has offset from year 2020
 
     // calculate the year
@@ -152,14 +191,9 @@ void TimeLoop::breakDayCounter(){
 
     // calculate month
     myDays -= LEAP_YEAR(year) ? 366 : 365;
-    byte monthLength = 0;
     for (month = 1; month < 13; month++) {
-        monthLength = monthDays[month];
-        if (month == 2) { // february
-            if (LEAP_YEAR(year)) {
-                monthLength++;
-            }
-        }
+        byte monthLength = getMonthLength(month, year);
+
         if (myDays > monthLength) {
           myDays -= monthLength;
         }
@@ -167,6 +201,9 @@ void TimeLoop::breakDayCounter(){
             break;
         }
     }
+    //these are the updated class variables
     day = myDays + 1; // day of month
+    month = month;
+    year = year;
 }
 

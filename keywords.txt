@@ -7,8 +7,12 @@ getSecondsCounter	KEYWORD2
 getDayCounter	KEYWORD2
 actualize	KEYWORD2
 getHrsMinSec	KEYWORD2
-getDowName	KEYWORD2
-deciSecondPassed	KEYWORD2
+getDayMonYear	KEYWORD2
 getDow	KEYWORD2
 getDowName	KEYWORD2
 getMonth	KEYWORD2
+getMonthName	KEYWORD2
+incrementMonth	KEYWORD2
+incrementYear	KEYWORD2
+decrementMonth	KEYWORD2
+decrementYear	KEYWORD2

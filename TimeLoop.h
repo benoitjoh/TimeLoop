@@ -15,6 +15,7 @@
 // leap year calculator expects year argument as year yyyy
 #define LEAP_YEAR(Y)     ( ((Y)>0) && !((Y)%4) && ( ((Y)%100) || !((Y)%400) ) )
 
+byte getMonthLength(int myMonth, int myYear);
 
 class TimeLoop
 {
@@ -28,9 +29,9 @@ class TimeLoop
         long getSecondsCounter();
         long getDayCounter();
 
-
         //
         byte actualize();
+
         //
         String getHrsMinSec();
         String getDayMonYear();
@@ -41,10 +42,15 @@ class TimeLoop
         byte getMonth(int increment);
         String getMonthName();
 
+        void incrementMonth();
+        void incrementYear() ;
+        void decrementMonth();
+        void decrementYear();
+
     protected:
     private:
         //methods
-        void breakDayCounter();
+        void breakupDayCounter();
 
         // variables
         unsigned long lastDeciSecsIncMillis;
