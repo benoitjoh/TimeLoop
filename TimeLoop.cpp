@@ -102,8 +102,10 @@ void TimeLoop::incrementMonth() {
 }
 
 void TimeLoop::decrementMonth() {
-    dayCounter -= getMonthLength(month - 1, year);
-    breakupDayCounter();
+    if (dayCounter > getMonthLength(month - 1, year)) {
+        dayCounter -= getMonthLength(month - 1, year);
+        breakupDayCounter();
+    }
 }
 
 void TimeLoop::incrementYear() {
@@ -112,8 +114,11 @@ void TimeLoop::incrementYear() {
 }
 
 void TimeLoop::decrementYear() {
-    dayCounter -= (LEAP_YEAR(year - 1) ? 366 : 365);
-    breakupDayCounter();
+
+    if (dayCounter > (LEAP_YEAR(year - 1) ? 366 : 365)) {
+        dayCounter -= (LEAP_YEAR(year - 1) ? 366 : 365);
+        breakupDayCounter();
+    }
 }
 
 
@@ -164,7 +169,7 @@ String TimeLoop::getDayMonYear() {
   *
   */
 int TimeLoop::getDow(int increment){
-    wDay = ((dayCounter + 4) % 7);  // Monday is day 0
+    wDay = ((dayCounter + 1) % 7);  // Monday is day 0
     wDay += increment;
     if (wDay > 6) { wDay -= 7; }
     if (wDay < 0) { wDay += 7; }
