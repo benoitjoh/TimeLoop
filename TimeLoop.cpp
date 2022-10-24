@@ -10,7 +10,7 @@
 
 
 static const String dow[7] = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
-static const String monthNames[13]={"", "Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug" , "Sep" , "Okt" , "Nov" , "Dez" };
+static const String monthNames[13]={"", "Jan", "Feb", "M\xe1r", "Apr", "Mai", "Jun", "Jul", "Aug" , "Sep" , "Okt" , "Nov" , "Dez" };
 
 
 /** @brief Method to calculate the days in a month in a given year
@@ -47,7 +47,7 @@ String lFill(String a) {
   */
 TimeLoop::TimeLoop(int dummy) {
     lastDeciSecsIncMillis = 0;
-    deciSecondsCounter = 0;
+    lastSecsIncMillis = 0;
 
     // note: the seconds and days- Counter have to be set after
     // construction!
@@ -131,11 +131,10 @@ void TimeLoop::decrementYear() {
   */
 byte TimeLoop::actualize() {
     if ( millis() - lastDeciSecsIncMillis >= 100 ) {
-        deciSecondsCounter++;
         lastDeciSecsIncMillis += 100;
-        if (deciSecondsCounter >= 10) {
-          deciSecondsCounter = 0;
-          if (incrementSecondsCounter(1)) {
+        if (millis() - lastSecsIncMillis >= 1000) {
+         lastSecsIncMillis += 1000;
+         if (incrementSecondsCounter(1)) {
             return 3;
           }
           return 2;

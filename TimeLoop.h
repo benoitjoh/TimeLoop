@@ -52,7 +52,7 @@ class TimeLoop
 
         // variables
         unsigned long lastDeciSecsIncMillis;
-        int deciSecondsCounter;
+        unsigned long lastSecsIncMillis;
         long secondsCounter;
         long dayCounter;
 
