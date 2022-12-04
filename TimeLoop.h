@@ -34,11 +34,13 @@ class TimeLoop
         String getHrsMinSec();
         String getDayMonYear();
 
-        int getDow(int increment);
-        String getDowName(int increment);
+        int getDayOfWeek(int offset);
+        String getDayOfWeekName(int offset);
 
-        int getMonth(int increment);
-        String getMonthName(int increment);
+        int getDayOfYear(int offset);
+
+        int getMonth(int offset);
+        String getMonthName(int offset);
 
         void incrementMonth();
         void incrementYear() ;
@@ -63,6 +65,7 @@ class TimeLoop
         int month;
         int year;
         int wDay;
+        int dayOfYear;
 
 };
 
