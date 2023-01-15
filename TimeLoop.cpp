@@ -283,17 +283,19 @@ void TimeLoop::breakupDayCounter(){
     // calculate the year. Increment from year to year until we step over dayCounter
     year = YEAR_OFFSET;
     unsigned long myDays = 0;
-    while((unsigned)(myDays += (LEAP_YEAR(year) ? 366 : 365)) <= dayCounter) {
+    while((unsigned)(myDays += (LEAP_YEAR(year) ? 366 : 365)) < dayCounter) {
         year++;
     }
-    myDays -= LEAP_YEAR(year) ? 366 : 365; // one step back to the 1.Jan of the year
 
-    // calculate month
+    myDays -= LEAP_YEAR(year) ? 366 : 365; // one step back to the 1.Jan of the year
+    //Serial.println("year:" + String(year) + "myDays:" + String(myDays));
+
     myDays = dayCounter - myDays; // day of year
 
     // update class variable for dayOfYear
     dayOfYear = myDays;
 
+    // calculate month
     for (month = 1; month < 13; month++) {
         byte monthLength = getMonthLength(month, year);
 
