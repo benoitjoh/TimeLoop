@@ -18,7 +18,7 @@ byte getMonthLength(int myMonth, int myYear);
 class TimeLoop
 {
     public:
-        TimeLoop(int dummy);
+        TimeLoop(int milliSecPerSecond);
 
         void setSecondsCounter(long value);
         void setDayCounter(long value);
@@ -33,6 +33,7 @@ class TimeLoop
         //
         String getHrsMinSec();
         String getDayMonYear();
+        String getSec();
 
         int getDayOfWeek(int offset);
         String getDayOfWeekName(int offset);
@@ -47,12 +48,17 @@ class TimeLoop
         void decrementMonth();
         void decrementYear();
 
+        void resetSecToZero();
+
     protected:
     private:
         //methods
         void breakupDayCounter();
 
         // variables
+        int milliSecPerSecond;
+
+
         unsigned long lastDeciSecsIncMillis;
         unsigned long lastSecsIncMillis;
         long secondsCounter;

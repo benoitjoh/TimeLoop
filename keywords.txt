@@ -13,7 +13,9 @@ getDayOfWeekName	KEYWORD2
 getMonth	KEYWORD2
 getMonthName	KEYWORD2
 getDayOfYear    KEYWORD2
+getSec  KEYWORD2
 incrementMonth	KEYWORD2
 incrementYear	KEYWORD2
 decrementMonth	KEYWORD2
 decrementYear	KEYWORD2
+resetSecToZero  KEYWORD2

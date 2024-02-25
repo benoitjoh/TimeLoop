@@ -2,6 +2,7 @@
 
 #define YEAR_OFFSET 2020 // 1.1.2020 is represented by 1 in the daysCounter
 
+
 /** @brief Constants with the day and month names
   *
   */
@@ -55,11 +56,13 @@ String lFill(String a) {
 // -------- CLASS TimeLoop -----------------------------------------------------------------
 
 /** @brief Constructor
+    Parameter milliSecPerSecondCorrection depends from how precise the internal clock is.
+    if clock is to slow you can speed it up by -1, wich means class assumes 999ms for a second
   */
-TimeLoop::TimeLoop(int dummy) {
+TimeLoop::TimeLoop(int milliSecPerSecondCorrection) {
     lastDeciSecsIncMillis = 0;
     lastSecsIncMillis = 0;
-
+    milliSecPerSecond = 1000 + milliSecPerSecondCorrection;
     // note: the seconds and days- Counter have to be set after
     // construction!
 }
@@ -101,8 +104,8 @@ long TimeLoop::getDayCounter() {
 byte TimeLoop::actualize() {
     if ( millis() - lastDeciSecsIncMillis >= 100 ) {
         lastDeciSecsIncMillis += 100;
-        if (millis() - lastSecsIncMillis >= 1000) {
-         lastSecsIncMillis += 1000;
+        if (millis() - lastSecsIncMillis >= milliSecPerSecond) {
+         lastSecsIncMillis += milliSecPerSecond;
          if (incrementSecondsCounter(1)) {
             return 3;
           }
@@ -173,6 +176,17 @@ void TimeLoop::decrementYear() {
     }
 }
 
+/** @brief set time to the beginning of the actual minute
+  *
+  */
+void TimeLoop::resetSecToZero() {
+    secs = secondsCounter % 60;
+    secondsCounter = secondsCounter - secs;
+    secs = 0;
+    return;
+}
+
+/* methods for reading dates and time*/
 
 
 /** @brief get time as a string in 24h format
@@ -187,6 +201,17 @@ String TimeLoop::getHrsMinSec() {
     hrs = remains / 60;
     return lFill(String(hrs)) + ":" + lFill(String(mins)) + ":" +  lFill(String(secs));
 }
+
+/** @brief get seconds as string
+  *
+  * @result     string "ss"
+  *
+  */
+String TimeLoop::getSec() {
+    secs = secondsCounter % 60;
+    return lFill(String(secs));
+}
+
 
 /** @brief get date as a string in EU format
   *
@@ -265,6 +290,10 @@ int TimeLoop::getDayOfYear(int offset) {
     }
     return dayOfYear;
 }
+
+
+/* method for calculation and transforming */
+
 
 
 /** @brief splits dayCounter in day month year
