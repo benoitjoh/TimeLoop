@@ -19,3 +19,4 @@ incrementYear	KEYWORD2
 decrementMonth	KEYWORD2
 decrementYear	KEYWORD2
 resetSecToZero  KEYWORD2
+setMsPerHourCorrection  KEYWORD2

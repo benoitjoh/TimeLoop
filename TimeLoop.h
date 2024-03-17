@@ -18,7 +18,8 @@ byte getMonthLength(int myMonth, int myYear);
 class TimeLoop
 {
     public:
-        TimeLoop(int milliSecPerSecond);
+        TimeLoop(byte dummy);
+        void setMsPerHourCorrection(int millisPerHourCorr);
 
         void setSecondsCounter(long value);
         void setDayCounter(long value);
@@ -72,6 +73,7 @@ class TimeLoop
         int year;
         int wDay;
         int dayOfYear;
+        int msPerHourCorrection;
 
 };
 

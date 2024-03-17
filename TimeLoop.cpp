@@ -59,12 +59,22 @@ String lFill(String a) {
     Parameter milliSecPerSecondCorrection depends from how precise the internal clock is.
     if clock is to slow you can speed it up by -1, wich means class assumes 999ms for a second
   */
-TimeLoop::TimeLoop(int milliSecPerSecondCorrection) {
+TimeLoop::TimeLoop(byte dummy) {
     lastDeciSecsIncMillis = 0;
     lastSecsIncMillis = 0;
-    milliSecPerSecond = 1000 + milliSecPerSecondCorrection;
     // note: the seconds and days- Counter have to be set after
     // construction!
+}
+
+
+/** @brief Sets a correction factor for clock
+    Parameter milliSecPerSecondCorrection depends from how precise the internal clock is.
+    if clock is to slow you can speed it up by +/- x, wich add x ms at the beginning of
+    a new hour
+    value between -900 and 900 which means about +/- 21,6 sec per day
+  */
+void TimeLoop::setMsPerHourCorrection(int millisPerHourCorr) {
+    msPerHourCorrection = millisPerHourCorr;
 }
 
 /* getter / setter */
@@ -104,17 +114,17 @@ long TimeLoop::getDayCounter() {
 byte TimeLoop::actualize() {
     if ( millis() - lastDeciSecsIncMillis >= 100 ) {
         lastDeciSecsIncMillis += 100;
-        if (millis() - lastSecsIncMillis >= milliSecPerSecond) {
-         lastSecsIncMillis += milliSecPerSecond;
-         if (incrementSecondsCounter(1)) {
-            return 3;
-          }
-          return 2;
-        }
+        if (millis() - lastSecsIncMillis >= 1000) {
+            lastSecsIncMillis += 1000;
+            if (incrementSecondsCounter(1)) {
+                return 3;
+                }
+            return 2;
+            }
         return 1;
-    }
+        }
     return 0;
-}
+    }
 
 
 
@@ -122,21 +132,31 @@ byte TimeLoop::actualize() {
   *
   * if overflow it also increments or decrements the daycounter and returns true
   *
+  * if sec==0 which means new hour begins, the msPerHourCorrection is applied
+  *
   * @param  increment: positive or negativ integer
   * @result True if day was changed (step over midnight)
   */
 bool TimeLoop::incrementSecondsCounter(long increment) {
     secondsCounter = secondsCounter + increment;
+    
+    // full hour, apply corrections
+    if ( (secondsCounter % 3600) == 0) {
+        Serial.println("new hour. correct by: " + String(msPerHourCorrection) + "ms");
+        lastSecsIncMillis += msPerHourCorrection;
+        }
+    
+    // increment / decrement and overflow    
     if (secondsCounter < 0) {
         secondsCounter += 86400;
         incrementDayCounter(-1);
         return true;
-    }
+        }
     if (secondsCounter >= 86400) {
         secondsCounter -= 86400;
         incrementDayCounter(1);
         return true;
-    }
+        }
     return false;
 }
 
