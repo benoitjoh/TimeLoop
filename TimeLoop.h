@@ -57,7 +57,8 @@ class TimeLoop
         void breakupDayCounter();
 
         // variables
-        int milliSecPerSecond;
+        int msPerHourCorrection;
+        bool correctionLocked;
 
 
         unsigned long lastDeciSecsIncMillis;
@@ -73,7 +74,6 @@ class TimeLoop
         int year;
         int wDay;
         int dayOfYear;
-        int msPerHourCorrection;
 
 };
 

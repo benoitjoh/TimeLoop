@@ -56,19 +56,18 @@ String lFill(String a) {
 // -------- CLASS TimeLoop -----------------------------------------------------------------
 
 /** @brief Constructor
-    Parameter milliSecPerSecondCorrection depends from how precise the internal clock is.
-    if clock is to slow you can speed it up by -1, wich means class assumes 999ms for a second
   */
 TimeLoop::TimeLoop(byte dummy) {
     lastDeciSecsIncMillis = 0;
     lastSecsIncMillis = 0;
+    correctionLocked = false;
     // note: the seconds and days- Counter have to be set after
     // construction!
 }
 
 
 /** @brief Sets a correction factor for clock
-    Parameter milliSecPerSecondCorrection depends from how precise the internal clock is.
+    Parameter millisPerHourCorr depends from how precise the internal clock is.
     if clock is to slow you can speed it up by +/- x, wich add x ms at the beginning of
     a new hour
     value between -900 and 900 which means about +/- 21,6 sec per day
@@ -112,9 +111,12 @@ long TimeLoop::getDayCounter() {
   *         if a day finished (midnight) --> returns 3
   */
 byte TimeLoop::actualize() {
-    if ( millis() - lastDeciSecsIncMillis >= 100 ) {
+    unsigned long now = millis();
+    if ( now - lastDeciSecsIncMillis >= 100 ) {
         lastDeciSecsIncMillis += 100;
-        if (millis() - lastSecsIncMillis >= 1000) {
+        int delta = now - lastSecsIncMillis;
+        if (delta >= 1000) {
+        //Serial.println("sec: " + String(secondsCounter) +" last: " + String(lastSecsIncMillis) + " now: " + String(now) + "delta: " + String(delta));
             lastSecsIncMillis += 1000;
             if (incrementSecondsCounter(1)) {
                 return 3;
@@ -138,14 +140,26 @@ byte TimeLoop::actualize() {
   * @result True if day was changed (step over midnight)
   */
 bool TimeLoop::incrementSecondsCounter(long increment) {
-    secondsCounter = secondsCounter + increment;
-    
+    secondsCounter += increment;
     // full hour, apply corrections
     if ( (secondsCounter % 3600) == 0) {
-        Serial.println("new hour. correct by: " + String(msPerHourCorrection) + "ms");
-        lastSecsIncMillis += msPerHourCorrection;
+        if (correctionLocked == false) {
+            // add seconds to counter, and substract the millisecs from the time where last incremented
+            int secDelta = msPerHourCorrection / 1000;
+            int msDelta = msPerHourCorrection % 1000;
+            secondsCounter += secDelta;
+            //Serial.println("new hour. correct by: " + String(secDelta) + "s, " + String(msDelta) + "ms");
+            lastSecsIncMillis -= msDelta;
+            // lock this correction part for 5 seconds
+            correctionLocked = true;
+            }
         }
-    
+        
+    if ( (secondsCounter % 3600) == 5) { 
+        // unlock correction
+        correctionLocked = false; 
+        }
+
     // increment / decrement and overflow    
     if (secondsCounter < 0) {
         secondsCounter += 86400;
