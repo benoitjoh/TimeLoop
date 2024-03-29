@@ -34,7 +34,9 @@ class TimeLoop
         //
         String getHrsMinSec();
         String getDayMonYear();
-        String getSec();
+        
+        byte getSec();
+        byte getHour();
 
         int getDayOfWeek(int offset);
         String getDayOfWeekName(int offset);
@@ -55,6 +57,7 @@ class TimeLoop
     private:
         //methods
         void breakupDayCounter();
+        void actualizeHMS();
 
         // variables
         int msPerHourCorrection;

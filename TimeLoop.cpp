@@ -220,37 +220,50 @@ void TimeLoop::resetSecToZero() {
     return;
 }
 
+
+
 /* methods for reading dates and time*/
 
-
-/** @brief get time as a string in 24h format
-  *
-  * @result     string hh:mm:ss
-  *
+/** @brief updates hrs mins secs
   */
-String TimeLoop::getHrsMinSec() {
+void TimeLoop::actualizeHMS() {
     secs = secondsCounter % 60;
     unsigned int remains = secondsCounter / 60;
     mins = remains % 60;
     hrs = remains / 60;
+    return;
+}
+
+
+/** @brief get time as a string in 24h format
+  * @result     string hh:mm:ss
+  */
+String TimeLoop::getHrsMinSec() {
+    actualizeHMS();
     return lFill(String(hrs)) + ":" + lFill(String(mins)) + ":" +  lFill(String(secs));
 }
 
-/** @brief get seconds as string
-  *
-  * @result     string "ss"
-  *
+
+/** @brief get seconds as byte
+  * @result     byte seconds
   */
-String TimeLoop::getSec() {
+byte TimeLoop::getSec() {
     secs = secondsCounter % 60;
-    return lFill(String(secs));
+    return secs;
+}
+
+
+/** @brief get hour as byte
+  * @result     byte hour
+  */
+byte TimeLoop::getHour() {
+    actualizeHMS();
+    return hrs;
 }
 
 
 /** @brief get date as a string in EU format
-  *
   * @result      a string dd.mm.yyyy
-  *
   */
 String TimeLoop::getDayMonYear() {
 
